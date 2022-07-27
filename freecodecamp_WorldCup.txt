@@ -1,0 +1,890 @@
+codeally@00a2d78955bd:~/project$ psql --username=freecodecamp --dbname=postgres
+psql (12.9 (Ubuntu 12.9-2.pgdg20.04+1))
+Type "help" for help.
+
+postgres=> \l
+                               List of databases
+     Name     |  Owner   | Encoding | Collate |  Ctype  |   Access privileges   
+--------------+----------+----------+---------+---------+-----------------------
+ postgres     | postgres | UTF8     | C.UTF-8 | C.UTF-8 | 
+ template0    | postgres | UTF8     | C.UTF-8 | C.UTF-8 | =c/postgres          +
+              |          |          |         |         | postgres=CTc/postgres
+ template1    | postgres | UTF8     | C.UTF-8 | C.UTF-8 | =c/postgres          +
+              |          |          |         |         | postgres=CTc/postgres
+ worldcuptest | postgres | UTF8     | C.UTF-8 | C.UTF-8 | 
+(4 rows)
+
+postgres=> CREATE DATABASE worldcup;
+CREATE DATABASE
+postgres=> \l
+                                 List of databases
+     Name     |    Owner     | Encoding | Collate |  Ctype  |   Access privileges   
+--------------+--------------+----------+---------+---------+-----------------------
+ postgres     | postgres     | UTF8     | C.UTF-8 | C.UTF-8 | 
+ template0    | postgres     | UTF8     | C.UTF-8 | C.UTF-8 | =c/postgres          +
+              |              |          |         |         | postgres=CTc/postgres
+ template1    | postgres     | UTF8     | C.UTF-8 | C.UTF-8 | =c/postgres          +
+              |              |          |         |         | postgres=CTc/postgres
+ worldcup     | freecodecamp | UTF8     | C.UTF-8 | C.UTF-8 | 
+ worldcuptest | postgres     | UTF8     | C.UTF-8 | C.UTF-8 | 
+(5 rows)
+
+postgres=> \c worldcup
+You are now connected to database "worldcup" as user "freecodecamp".
+worldcup=> CREATE TABLE teams();
+CREATE TABLE
+worldcup=> CREATE TABLE games();
+CREATE TABLE
+worldcup=> \d
+           List of relations
+ Schema | Name  | Type  |    Owner     
+--------+-------+-------+--------------
+ public | games | table | freecodecamp
+ public | teams | table | freecodecamp
+(2 rows)
+
+worldcup=> ALTER TABLE teams ADD PRIMARY KEY(team_id);
+ERROR:  column "team_id" of relation "teams" does not exist
+worldcup=> ALTER TABLE teams ADD COLUMN team_id SERIAL PRIMARY KEY;
+ALTER TABLE
+worldcup=> \d teams
+                               Table "public.teams"
+ Column  |  Type   | Collation | Nullable |                Default                 
+---------+---------+-----------+----------+----------------------------------------
+ team_id | integer |           | not null | nextval('teams_team_id_seq'::regclass)
+Indexes:
+    "teams_pkey" PRIMARY KEY, btree (team_id)
+
+worldcup=> ALTER TABLE teams ADD COLUMN name VARCHAR(30);
+ALTER TABLE
+worldcup=> ALTER TABLE teams ADD UNIQUE(name);
+ALTER TABLE
+worldcup=> \d teams
+                                      Table "public.teams"
+ Column  |         Type          | Collation | Nullable |                Default                 
+---------+-----------------------+-----------+----------+----------------------------------------
+ team_id | integer               |           | not null | nextval('teams_team_id_seq'::regclass)
+ name    | character varying(30) |           |          | 
+Indexes:
+    "teams_pkey" PRIMARY KEY, btree (team_id)
+    "teams_name_key" UNIQUE CONSTRAINT, btree (name)
+
+worldcup=> ALTER TABLE games ADD COLUMN game_id SERIAL PRIMARY KEY;
+ALTER TABLE
+worldcup=> ALTER TABLE games ADD COLUMN year INT;
+ALTER TABLE
+worldcup=> ALTER TABLE games ADD COLUMN round VARCHAR;
+ALTER TABLE
+worldcup=> ALTER TABLE games ADD FOREIGN KEY(winner_id) REFERENCES teams(team_id);
+ERROR:  column "winner_id" referenced in foreign key constraint does not exist
+worldcup=> ALTER TABLE games ADD COLUMN winner_id INT REFERENCES teams(team_id);
+ALTER TABLE
+worldcup=> \d games
+                                     Table "public.games"
+  Column   |       Type        | Collation | Nullable |                Default                 
+-----------+-------------------+-----------+----------+----------------------------------------
+ game_id   | integer           |           | not null | nextval('games_game_id_seq'::regclass)
+ year      | integer           |           |          | 
+ round     | character varying |           |          | 
+ winner_id | integer           |           |          | 
+Indexes:
+    "games_pkey" PRIMARY KEY, btree (game_id)
+Foreign-key constraints:
+    "games_winner_id_fkey" FOREIGN KEY (winner_id) REFERENCES teams(team_id)
+
+worldcup=> ALTER TABLE games ADD COLUMN opponent_id INT REFERENCES teams(team_id);
+ALTER TABLE
+worldcup=> ALTER TABLE games ADD CLOUMN winner_goals INT;
+ERROR:  syntax error at or near "INT"
+LINE 1: ALTER TABLE games ADD CLOUMN winner_goals INT;
+                                                  ^
+worldcup=> ALTER TABLE games ADD COLUMN winner_goals INT;
+ALTER TABLE
+worldcup=> ALTER TABLE games ADD COLUMN opponent_goals INT;
+ALTER TABLE
+worldcup=> ALTER TABLE games ALTER COLUMN winner_goals, opponent_goals SET NOT NULL;
+ERROR:  syntax error at or near ","
+LINE 1: ALTER TABLE games ALTER COLUMN winner_goals, opponent_goals ...
+                                                   ^
+worldcup=> ALTER TABLE games ALTER COLUMN winner_goals SET NOT NULL;
+ALTER TABLE
+worldcup=> ALTER TABLE games ALTER COLUMN opponent_goals SET NOT NULL;
+ALTER TABLE
+worldcup=> ALTER TABLE games ALTER COLUMN opponent_id SET NOT NULL;
+ALTER TABLE
+worldcup=> ALTER TABLE games ALTER COLUMN winner_id SET NOT NULL;
+ALTER TABLE
+worldcup=> ALTER TABLE games ALTER COLUMN round SET NOT NULL;
+ALTER TABLE
+worldcup=> ALTER TABLE games ALTER COLUMN year SET NOT NULL;
+ALTER TABLE
+worldcup=> ALTER TABLE games ALTER COLUMN game_id SET NOT NULL;
+ALTER TABLE
+worldcup=> ALTER TABLE teams ALTER COLUMN team_id SET NOT NULL;
+ALTER TABLE
+worldcup=> ALTER TABLE teams ALTER COLUMN name SET NOT NULL;
+ALTER TABLE
+worldcup=> \d games
+                                        Table "public.games"
+     Column     |       Type        | Collation | Nullable |                Default                 
+----------------+-------------------+-----------+----------+----------------------------------------
+ game_id        | integer           |           | not null | nextval('games_game_id_seq'::regclass)
+ year           | integer           |           | not null | 
+ round          | character varying |           | not null | 
+ winner_id      | integer           |           | not null | 
+ opponent_id    | integer           |           | not null | 
+ winner_goals   | integer           |           | not null | 
+ opponent_goals | integer           |           | not null | 
+Indexes:
+    "games_pkey" PRIMARY KEY, btree (game_id)
+Foreign-key constraints:
+    "games_opponent_id_fkey" FOREIGN KEY (opponent_id) REFERENCES teams(team_id)
+    "games_winner_id_fkey" FOREIGN KEY (winner_id) REFERENCES teams(team_id)
+
+worldcup=> 
+	v
+
+
+codeally@00a2d78955bd:~/project$ ls -l insert_data.sh
+-rw-r--r-- 1 codeally strove 286 Jun 25 17:47 insert_data.sh
+codeally@00a2d78955bd:~/project$ chmod +x insert_data.sh
+codeally@00a2d78955bd:~/project$ ls -l insert_data.sh
+-rwxr-xr-x 1 codeally strove 286 Jun 25 17:47 insert_data.sh
+codeally@00a2d78955bd:~/project$ ./insert_data.sh
+codeally@00a2d78955bd:~/project$ ls
+expected_output.txt  games.csv  insert_data.sh  learn-world-cup-database  queries.sh
+codeally@00a2d78955bd:~/project$ touch games_test.csv
+codeally@00a2d78955bd:~/project$ ls
+expected_output.txt  games.csv  games_test.csv  insert_data.sh  learn-world-cup-database  queries.sh
+codeally@00a2d78955bd:~/project$ cp games.csv games_test.csv
+codeally@00a2d78955bd:~/project$ 
+	v
+
+
+
+
+#! /bin/bash
+
+if [[ $1 == "test" ]]
+then
+  PSQL="psql --username=postgres --dbname=worldcuptest -t --no-align -c"
+else
+  PSQL="psql --username=freecodecamp --dbname=worldcup -t --no-align -c"
+fi
+
+# Do not change code above this line. Use the PSQL variable above to query your database.
+
+#what is the point of the echo???
+echo $($PSQL "TRUNCATE games, teams")
+
+#https://tldp.org/LDP/abs/html/special-chars.html
+cat games_test.csv | while IFS="," read YEAR ROUND WINNER OPPONENT WGOALS OGOALS
+do
+  #echo $WINNER " vs. " $OPPONENT
+  #Checking for winner & opponent duplicates in our database
+  if [[ $WINNER != "winner" ]]
+  then
+    W_TEAM_ID=$($PSQL "SELECT team_id FROM teams WHERE name='$WINNER'")
+    #O_TEAM_ID=$($PSQL :
+
+    if [[ -z $W_TEAM_ID ]]
+    then
+      INSERT_WINNER_TEAM=$($PSQL "INSERT INTO teams(name) VALUES('$WINNER')")
+
+      if [[ $INSERT_WINNER_TEAM == "INSERT 0 1" ]]
+      then
+        echo Winning team $WINNER is now it the teams table
+      fi
+    fi
+
+    if [[
+  fi
+done
+	v
+
+
+codeally@184fa67db259:~/project$ ./insert_data.sh
+winner  vs.  opponent
+France  vs.  Croatia
+Belgium  vs.  England
+Croatia  vs.  England
+France  vs.  Belgium
+Croatia  vs.  Russia
+England  vs.  Sweden
+Belgium  vs.  Brazil
+France  vs.  Uruguay
+England  vs.  Colombia
+Sweden  vs.  Switzerland
+Belgium  vs.  Japan
+Brazil  vs.  Mexico
+Croatia  vs.  Denmark
+Russia  vs.  Spain
+Uruguay  vs.  Portugal
+France  vs.  Argentina
+Germany  vs.  Argentina
+Netherlands  vs.  Brazil
+Argentina  vs.  Netherlands
+Germany  vs.  Brazil
+Netherlands  vs.  Costa Rica
+Argentina  vs.  Belgium
+Brazil  vs.  Colombia
+Germany  vs.  France
+Brazil  vs.  Chile
+Colombia  vs.  Uruguay
+France  vs.  Nigeria
+Germany  vs.  Algeria
+Netherlands  vs.  Mexico
+Costa Rica  vs.  Greece
+Argentina  vs.  Switzerland
+Belgium  vs.  United States
+./insert_data.sh: line 92: syntax error: unexpected end of file
+codeally@184fa67db259:~/project$ ./insert_data.sh
+TRUNCATE TABLE
+./insert_data.sh: line 28: syntax error near unexpected token `done'
+./insert_data.sh: line 28: `done'
+codeally@184fa67db259:~/project$ ./insert_data.sh
+TRUNCATE TABLE
+./insert_data.sh: line 34: syntax error near unexpected token `done'
+./insert_data.sh: line 34: `done'
+codeally@184fa67db259:~/project$ ./insert_data.sh
+TRUNCATE TABLE
+./insert_data.sh: line 34: syntax error near unexpected token `done'
+./insert_data.sh: line 34: `done'
+codeally@184fa67db259:~/project$ ./insert_data.sh
+TRUNCATE TABLE
+./insert_data.sh: line 101: syntax error: unexpected end of file
+codeally@184fa67db259:~/project$ ./insert_data.sh
+TRUNCATE TABLE
+./insert_data.sh: line 101: syntax error: unexpected end of file
+codeally@184fa67db259:~/project$ ./insert_data.sh
+TRUNCATE TABLE
+./insert_data.sh: line 101: syntax error: unexpected end of file
+codeally@184fa67db259:~/project$ ./insert_data.sh
+TRUNCATE TABLE
+codeally@184fa67db259:~/project$ ./insert_data.sh
+TRUNCATE TABLE
+Winning team France is now it the teams table
+Winning team Belgium is now it the teams table
+Winning team Croatia is now it the teams table
+Winning team England is now it the teams table
+Winning team Sweden is now it the teams table
+Winning team Brazil is now it the teams table
+Winning team Russia is now it the teams table
+Winning team Uruguay is now it the teams table
+Winning team Germany is now it the teams table
+Winning team Netherlands is now it the teams table
+Winning team Argentina is now it the teams table
+Winning team Colombia is now it the teams table
+Winning team Costa Rica is now it the teams table
+codeally@184fa67db259:~/project$ 
+	v
+
+
+#! /bin/bash
+
+if [[ $1 == "test" ]]
+then
+  PSQL="psql --username=postgres --dbname=worldcuptest -t --no-align -c"
+else
+  PSQL="psql --username=freecodecamp --dbname=worldcup -t --no-align -c"
+fi
+
+# Do not change code above this line. Use the PSQL variable above to query your database.
+
+#what is the point of the echo???
+echo $($PSQL "TRUNCATE TABLE games, teams")
+
+#https://tldp.org/LDP/abs/html/special-chars.html
+cat games_test.csv | while IFS="," read YEAR ROUND WINNER OPPONENT WGOALS OGOALS
+do
+  #echo $WINNER " vs. " $OPPONENT
+  #Checking for winner & opponent duplicates in our database
+  if [[ $WINNER != "winner" ]]
+  then
+    W_TEAM_ID=$($PSQL "SELECT team_id FROM teams WHERE name='$WINNER'")
+    #O_TEAM_ID=$($PSQL :
+
+    if [[ -z $W_TEAM_ID ]]
+    then
+      INSERT_WINNER_TEAM=$($PSQL "INSERT INTO teams(name) VALUES('$WINNER')")
+
+      if [[ $INSERT_WINNER_TEAM == "INSERT 0 1" ]]
+      then
+        echo Winning team $WINNER is now it the teams table
+      fi
+    fi
+
+    if [[ $OPPONENT != 'opponent' ]]
+    then
+      #I think you need both rows here because $OPPONENT is used to find the correct row, IF present, and returns either
+      #the founds' team_id or 0 if not found!!!! If 0 then add it!
+      O_TEAM_ID=$($PSQL "SELECT team_id FROM teams WHERE name='$OPPONENT'")
+
+      if [[ -z $OPPONENT ]]
+      then
+        INSERT_OPPONENT_TEAM=$($PSQL "INSERT INTO teams(name) VALUE('$OPPONENT')")
+
+        if [[ $INSERT_OPPONENT_TEAM == "INSERT 0 1" ]]
+        then
+          echo Opponent team $OPPONENT is now in the teams table
+        fi
+      fi
+    fi
+  fi
+done
+	v
+
+
+
+codeally@184fa67db259:~/project$ ./insert_data.sh
+TRUNCATE TABLE
+Winning team France is now it the teams table
+./insert_data.sh: line 38: $':I think you need both rows here because $OPPONENT is used to find the correct row, IF present, and returns either\n      the founds team_id or 0 if not found!!!! If 0 then add it!': command not found
+Winning team Belgium is now it the teams table
+./insert_data.sh: line 38: $':I think you need both rows here because $OPPONENT is used to find the correct row, IF present, and returns either\n      the founds team_id or 0 if not found!!!! If 0 then add it!': command not found
+Winning team Croatia is now it the teams table
+./insert_data.sh: line 38: $':I think you need both rows here because $OPPONENT is used to find the correct row, IF present, and returns either\n      the founds team_id or 0 if not found!!!! If 0 then add it!': command not found
+./insert_data.sh: line 38: $':I think you need both rows here because $OPPONENT is used to find the correct row, IF present, and returns either\n      the founds team_id or 0 if not found!!!! If 0 then add it!': command not found
+./insert_data.sh: line 38: $':I think you need both rows here because $OPPONENT is used to find the correct row, IF present, and returns either\n      the founds team_id or 0 if not found!!!! If 0 then add it!': command not found
+Winning team England is now it the teams table
+./insert_data.sh: line 38: $':I think you need both rows here because $OPPONENT is used to find the correct row, IF present, and returns either\n      the founds team_id or 0 if not found!!!! If 0 then add it!': command not found
+./insert_data.sh: line 38: $':I think you need both rows here because $OPPONENT is used to find the correct row, IF present, and returns either\n      the founds team_id or 0 if not found!!!! If 0 then add it!': command not found
+./insert_data.sh: line 38: $':I think you need both rows here because $OPPONENT is used to find the correct row, IF present, and returns either\n      the founds team_id or 0 if not found!!!! If 0 then add it!': command not found
+./insert_data.sh: line 38: $':I think you need both rows here because $OPPONENT is used to find the correct row, IF present, and returns either\n      the founds team_id or 0 if not found!!!! If 0 then add it!': command not found
+Winning team Sweden is now it the teams table
+./insert_data.sh: line 38: $':I think you need both rows here because $OPPONENT is used to find the correct row, IF present, and returns either\n      the founds team_id or 0 if not found!!!! If 0 then add it!': command not found
+./insert_data.sh: line 38: $':I think you need both rows here because $OPPONENT is used to find the correct row, IF present, and returns either\n      the founds team_id or 0 if not found!!!! If 0 then add it!': command not found
+Winning team Brazil is now it the teams table
+./insert_data.sh: line 38: $':I think you need both rows here because $OPPONENT is used to find the correct row, IF present, and returns either\n      the founds team_id or 0 if not found!!!! If 0 then add it!': command not found
+./insert_data.sh: line 38: $':I think you need both rows here because $OPPONENT is used to find the correct row, IF present, and returns either\n      the founds team_id or 0 if not found!!!! If 0 then add it!': command not found
+Winning team Russia is now it the teams table
+./insert_data.sh: line 38: $':I think you need both rows here because $OPPONENT is used to find the correct row, IF present, and returns either\n      the founds team_id or 0 if not found!!!! If 0 then add it!': command not found
+Winning team Uruguay is now it the teams table
+./insert_data.sh: line 38: $':I think you need both rows here because $OPPONENT is used to find the correct row, IF present, and returns either\n      the founds team_id or 0 if not found!!!! If 0 then add it!': command not found
+./insert_data.sh: line 38: $':I think you need both rows here because $OPPONENT is used to find the correct row, IF present, and returns either\n      the founds team_id or 0 if not found!!!! If 0 then add it!': command not found
+Winning team Germany is now it the teams table
+./insert_data.sh: line 38: $':I think you need both rows here because $OPPONENT is used to find the correct row, IF present, and returns either\n      the founds team_id or 0 if not found!!!! If 0 then add it!': command not found
+Winning team Netherlands is now it the teams table
+./insert_data.sh: line 38: $':I think you need both rows here because $OPPONENT is used to find the correct row, IF present, and returns either\n      the founds team_id or 0 if not found!!!! If 0 then add it!': command not found
+Winning team Argentina is now it the teams table
+./insert_data.sh: line 38: $':I think you need both rows here because $OPPONENT is used to find the correct row, IF present, and returns either\n      the founds team_id or 0 if not found!!!! If 0 then add it!': command not found
+./insert_data.sh: line 38: $':I think you need both rows here because $OPPONENT is used to find the correct row, IF present, and returns either\n      the founds team_id or 0 if not found!!!! If 0 then add it!': command not found
+./insert_data.sh: line 38: $':I think you need both rows here because $OPPONENT is used to find the correct row, IF present, and returns either\n      the founds team_id or 0 if not found!!!! If 0 then add it!': command not found
+./insert_data.sh: line 38: $':I think you need both rows here because $OPPONENT is used to find the correct row, IF present, and returns either\n      the founds team_id or 0 if not found!!!! If 0 then add it!': command not found
+./insert_data.sh: line 38: $':I think you need both rows here because $OPPONENT is used to find the correct row, IF present, and returns either\n      the founds team_id or 0 if not found!!!! If 0 then add it!': command not found
+./insert_data.sh: line 38: $':I think you need both rows here because $OPPONENT is used to find the correct row, IF present, and returns either\n      the founds team_id or 0 if not found!!!! If 0 then add it!': command not found
+./insert_data.sh: line 38: $':I think you need both rows here because $OPPONENT is used to find the correct row, IF present, and returns either\n      the founds team_id or 0 if not found!!!! If 0 then add it!': command not found
+Winning team Colombia is now it the teams table
+./insert_data.sh: line 38: $':I think you need both rows here because $OPPONENT is used to find the correct row, IF present, and returns either\n      the founds team_id or 0 if not found!!!! If 0 then add it!': command not found
+./insert_data.sh: line 38: $':I think you need both rows here because $OPPONENT is used to find the correct row, IF present, and returns either\n      the founds team_id or 0 if not found!!!! If 0 then add it!': command not found
+./insert_data.sh: line 38: $':I think you need both rows here because $OPPONENT is used to find the correct row, IF present, and returns either\n      the founds team_id or 0 if not found!!!! If 0 then add it!': command not found
+./insert_data.sh: line 38: $':I think you need both rows here because $OPPONENT is used to find the correct row, IF present, and returns either\n      the founds team_id or 0 if not found!!!! If 0 then add it!': command not found
+Winning team Costa Rica is now it the teams table
+./insert_data.sh: line 38: $':I think you need both rows here because $OPPONENT is used to find the correct row, IF present, and returns either\n      the founds team_id or 0 if not found!!!! If 0 then add it!': command not found
+./insert_data.sh: line 38: $':I think you need both rows here because $OPPONENT is used to find the correct row, IF present, and returns either\n      the founds team_id or 0 if not found!!!! If 0 then add it!': command not found
+./insert_data.sh: line 38: $':I think you need both rows here because $OPPONENT is used to find the correct row, IF present, and returns either\n      the founds team_id or 0 if not found!!!! If 0 then add it!': command not found
+codeally@184fa67db259:~/project$ ./insert_data.sh
+TRUNCATE TABLE
+Winning team France is now it the teams table
+Winning team Belgium is now it the teams table
+Winning team Croatia is now it the teams table
+Winning team England is now it the teams table
+Winning team Sweden is now it the teams table
+Winning team Brazil is now it the teams table
+Winning team Russia is now it the teams table
+Winning team Uruguay is now it the teams table
+Winning team Germany is now it the teams table
+Winning team Netherlands is now it the teams table
+Winning team Argentina is now it the teams table
+Winning team Colombia is now it the teams table
+Winning team Costa Rica is now it the teams table
+codeally@184fa67db259:~/project$ 
+	v
+
+
+#! /bin/bash
+
+if [[ $1 == "test" ]]
+then
+  PSQL="psql --username=postgres --dbname=worldcuptest -t --no-align -c"
+else
+  PSQL="psql --username=freecodecamp --dbname=worldcup -t --no-align -c"
+fi
+
+# Do not change code above this line. Use the PSQL variable above to query your database.
+
+#what is the point of the echo???
+echo $($PSQL "TRUNCATE TABLE games, teams")
+
+#https://tldp.org/LDP/abs/html/special-chars.html
+cat games_test.csv | while IFS="," read YEAR ROUND WINNER OPPONENT WGOALS OGOALS
+do
+  #echo $WINNER " vs. " $OPPONENT
+  #Checking for winner & opponent duplicates in our database
+  if [[ $WINNER != "winner" ]]
+  then
+    W_TEAM_ID=$($PSQL "SELECT team_id FROM teams WHERE name='$WINNER'")
+    #O_TEAM_ID=$($PSQL :
+
+    if [[ -z $W_TEAM_ID ]]
+    then
+      INSERT_WINNER_TEAM=$($PSQL "INSERT INTO teams(name) VALUES('$WINNER')")
+
+      if [[ $INSERT_WINNER_TEAM == "INSERT 0 1" ]]
+      then
+        echo Winning team $WINNER is now it the teams table
+      fi
+    fi
+
+    if [[ $OPPONENT != 'opponent' ]]
+    then
+      #I think you need both rows here because $OPPONENT is used to find the correct row, IF present, and returns either
+      #the founds' team_id or 0 if not found!!!! If 0 then add it!
+      O_TEAM_ID=$($PSQL "SELECT team_id FROM teams WHERE name='$OPPONENT'")
+
+      if [[ -z $O_TEAM_ID ]]
+      then
+        INSERT_OPPONENT_TEAM=$($PSQL "INSERT INTO teams(name) VALUE('$OPPONENT')")
+
+        if [[ $INSERT_OPPONENT_TEAM == "INSERT 0 1" ]]
+        then
+          echo Opponent team $OPPONENT is now in the teams table
+        fi
+      fi
+    fi
+  fi
+done
+	v
+
+
+codeally@184fa67db259:~/project$ ./insert_data.sh
+TRUNCATE TABLE
+Winning team France is now it the teams table
+ERROR:  syntax error at or near "VALUE"
+LINE 1: INSERT INTO teams(name) VALUE('Croatia')
+                                ^
+Winning team Belgium is now it the teams table
+ERROR:  syntax error at or near "VALUE"
+LINE 1: INSERT INTO teams(name) VALUE('England')
+                                ^
+Winning team Croatia is now it the teams table
+ERROR:  syntax error at or near "VALUE"
+LINE 1: INSERT INTO teams(name) VALUE('England')
+                                ^
+ERROR:  syntax error at or near "VALUE"
+LINE 1: INSERT INTO teams(name) VALUE('Russia')
+                                ^
+Winning team England is now it the teams table
+ERROR:  syntax error at or near "VALUE"
+LINE 1: INSERT INTO teams(name) VALUE('Sweden')
+                                ^
+ERROR:  syntax error at or near "VALUE"
+LINE 1: INSERT INTO teams(name) VALUE('Brazil')
+                                ^
+ERROR:  syntax error at or near "VALUE"
+LINE 1: INSERT INTO teams(name) VALUE('Uruguay')
+                                ^
+ERROR:  syntax error at or near "VALUE"
+LINE 1: INSERT INTO teams(name) VALUE('Colombia')
+                                ^
+Winning team Sweden is now it the teams table
+ERROR:  syntax error at or near "VALUE"
+LINE 1: INSERT INTO teams(name) VALUE('Switzerland')
+                                ^
+ERROR:  syntax error at or near "VALUE"
+LINE 1: INSERT INTO teams(name) VALUE('Japan')
+                                ^
+Winning team Brazil is now it the teams table
+ERROR:  syntax error at or near "VALUE"
+LINE 1: INSERT INTO teams(name) VALUE('Mexico')
+                                ^
+ERROR:  syntax error at or near "VALUE"
+LINE 1: INSERT INTO teams(name) VALUE('Denmark')
+                                ^
+Winning team Russia is now it the teams table
+ERROR:  syntax error at or near "VALUE"
+LINE 1: INSERT INTO teams(name) VALUE('Spain')
+                                ^
+Winning team Uruguay is now it the teams table
+ERROR:  syntax error at or near "VALUE"
+LINE 1: INSERT INTO teams(name) VALUE('Portugal')
+                                ^
+ERROR:  syntax error at or near "VALUE"
+LINE 1: INSERT INTO teams(name) VALUE('Argentina')
+                                ^
+Winning team Germany is now it the teams table
+ERROR:  syntax error at or near "VALUE"
+LINE 1: INSERT INTO teams(name) VALUE('Argentina')
+                                ^
+Winning team Netherlands is now it the teams table
+Winning team Argentina is now it the teams table
+ERROR:  syntax error at or near "VALUE"
+LINE 1: INSERT INTO teams(name) VALUE('Costa Rica')
+                                ^
+ERROR:  syntax error at or near "VALUE"
+LINE 1: INSERT INTO teams(name) VALUE('Colombia')
+                                ^
+ERROR:  syntax error at or near "VALUE"
+LINE 1: INSERT INTO teams(name) VALUE('Chile')
+                                ^
+Winning team Colombia is now it the teams table
+ERROR:  syntax error at or near "VALUE"
+LINE 1: INSERT INTO teams(name) VALUE('Nigeria')
+                                ^
+ERROR:  syntax error at or near "VALUE"
+LINE 1: INSERT INTO teams(name) VALUE('Algeria')
+                                ^
+ERROR:  syntax error at or near "VALUE"
+LINE 1: INSERT INTO teams(name) VALUE('Mexico')
+                                ^
+Winning team Costa Rica is now it the teams table
+ERROR:  syntax error at or near "VALUE"
+LINE 1: INSERT INTO teams(name) VALUE('Greece')
+                                ^
+ERROR:  syntax error at or near "VALUE"
+LINE 1: INSERT INTO teams(name) VALUE('Switzerland')
+                                ^
+ERROR:  syntax error at or near "VALUE"
+LINE 1: INSERT INTO teams(name) VALUE('United States')
+                                ^
+codeally@184fa67db259:~/project$ 
+	v
+
+
+
+
+#! /bin/bash
+
+if [[ $1 == "test" ]]
+then
+  PSQL="psql --username=postgres --dbname=worldcuptest -t --no-align -c"
+else
+  PSQL="psql --username=freecodecamp --dbname=worldcup -t --no-align -c"
+fi
+
+# Do not change code above this line. Use the PSQL variable above to query your database.
+
+#what is the point of the echo???
+echo $($PSQL "TRUNCATE TABLE games, teams RESTART IDENTITY")
+
+#https://tldp.org/LDP/abs/html/special-chars.html
+cat games_test.csv | while IFS="," read YEAR ROUND WINNER OPPONENT WGOALS OGOALS
+do
+  #echo $WINNER " vs. " $OPPONENT
+  #Checking for winner & opponent duplicates in our database
+  if [[ $WINNER != "winner" ]]
+  then
+    W_TEAM_ID=$($PSQL "SELECT team_id FROM teams WHERE name='$WINNER'")
+    #O_TEAM_ID=$($PSQL :
+
+    if [[ -z $W_TEAM_ID ]]
+    then
+      INSERT_WINNER_TEAM=$($PSQL "INSERT INTO teams(name) VALUES('$WINNER')")
+
+      if [[ $INSERT_WINNER_TEAM == "INSERT 0 1" ]]
+      then
+        echo Winning team $WINNER is now it the teams table
+      fi
+    fi
+
+    #if [[ $OPPONENT != 'opponent' ]]
+    #then
+      #I think you need both rows here because $OPPONENT is used to find the correct row, IF present, and returns either
+      #the founds' team_id or 0 if not found!!!! If 0 then add it!
+      O_TEAM_ID=$($PSQL "SELECT team_id FROM teams WHERE name='$OPPONENT'")
+
+      if [[ -z $O_TEAM_ID ]]
+      then
+        INSERT_OPPONENT_TEAM=$($PSQL "INSERT INTO teams(name) VALUES('$OPPONENT')")
+
+        if [[ $INSERT_OPPONENT_TEAM == "INSERT 0 1" ]]
+        then
+          echo Opponent team $OPPONENT is now in the teams table
+        fi
+      fi
+    #fi
+  fi  
+done
+
+#Did this because when I added it above it added 1 team at a time and this!!!
+cat games_test.csv | while IFS="," read YEAR ROUND WINNER OPPONENT WGOALS OGOALS 
+do
+  if [[ $YEAR != "year" ]]
+  then
+    #You want to check if both teams are present TO GET THE GAME_ID
+    #GAME_ID is an important variable that we added in order to check opponent/winner teams and add them to games!!!!
+    #GAME_ID=$($PSQL "SELECT name FROM teams WHERE name='$WINNER' AND name='$OPPONENT'")
+    WINNER_ID=$($PSQL "SELECT team_id FROM teams WHERE name='$WINNER'")
+    OPPONENT_ID=$($PSQL "SELECT team_id FROM teams WHERE name='$OPPONENT'")
+
+    echo -e "In $YEAR during the $ROUND round:\n  $WINNER_ID scored $WGOALS goals\n  $OPPONENT_ID scored $OGOALS goals"
+
+    #if [[ -z $GAME_ID ]]
+    #then
+      INSERT_GAME=$($PSQL "INSERT INTO games(year, round, winner_id, opponent_id, winner_goals, opponent_goals) VALUES('$YEAR', '$ROUND', $WINNER_ID, $OPPONENT_ID, '$WGOALS', '$OGOALS')")
+    #fi
+  fi
+done
+	v
+
+
+codeally@2f074abca5ca:~/project$ ./insert_data.sh
+TRUNCATE TABLE
+Winning team France is now it the teams table
+Opponent team Croatia is now in the teams table
+Winning team Belgium is now it the teams table
+Opponent team England is now in the teams table
+Opponent team Russia is now in the teams table
+Opponent team Sweden is now in the teams table
+Opponent team Brazil is now in the teams table
+Opponent team Uruguay is now in the teams table
+Opponent team Colombia is now in the teams table
+Opponent team Switzerland is now in the teams table
+Opponent team Japan is now in the teams table
+Opponent team Mexico is now in the teams table
+Opponent team Denmark is now in the teams table
+Opponent team Spain is now in the teams table
+Opponent team Portugal is now in the teams table
+Opponent team Argentina is now in the teams table
+Winning team Germany is now it the teams table
+Winning team Netherlands is now it the teams table
+Opponent team Costa Rica is now in the teams table
+Opponent team Chile is now in the teams table
+Opponent team Nigeria is now in the teams table
+Opponent team Algeria is now in the teams table
+Opponent team Greece is now in the teams table
+Opponent team United States is now in the teams table
+In 2018 during the Final round:
+  1 scored 4 goals
+  2 scored 2 goals
+In 2018 during the Third Place round:
+  3 scored 2 goals
+  4 scored 0 goals
+In 2018 during the Semi-Final round:
+  2 scored 2 goals
+  4 scored 1 goals
+In 2018 during the Semi-Final round:
+  1 scored 1 goals
+  3 scored 0 goals
+In 2018 during the Quarter-Final round:
+  2 scored 3 goals
+  5 scored 2 goals
+In 2018 during the Quarter-Final round:
+  4 scored 2 goals
+  6 scored 0 goals
+In 2018 during the Quarter-Final round:
+  3 scored 2 goals
+  7 scored 1 goals
+In 2018 during the Quarter-Final round:
+  1 scored 2 goals
+  8 scored 0 goals
+In 2018 during the Eighth-Final round:
+  4 scored 2 goals
+  9 scored 1 goals
+In 2018 during the Eighth-Final round:
+  6 scored 1 goals
+  10 scored 0 goals
+In 2018 during the Eighth-Final round:
+  3 scored 3 goals
+  11 scored 2 goals
+In 2018 during the Eighth-Final round:
+  7 scored 2 goals
+  12 scored 0 goals
+In 2018 during the Eighth-Final round:
+  2 scored 2 goals
+  13 scored 1 goals
+In 2018 during the Eighth-Final round:
+  5 scored 2 goals
+  14 scored 1 goals
+In 2018 during the Eighth-Final round:
+  8 scored 2 goals
+  15 scored 1 goals
+In 2018 during the Eighth-Final round:
+  1 scored 4 goals
+  16 scored 3 goals
+In 2014 during the Final round:
+  17 scored 1 goals
+  16 scored 0 goals
+In 2014 during the Third Place round:
+  18 scored 3 goals
+  7 scored 0 goals
+In 2014 during the Semi-Final round:
+  16 scored 1 goals
+  18 scored 0 goals
+In 2014 during the Semi-Final round:
+  17 scored 7 goals
+  7 scored 1 goals
+In 2014 during the Quarter-Final round:
+  18 scored 1 goals
+  19 scored 0 goals
+In 2014 during the Quarter-Final round:
+  16 scored 1 goals
+  3 scored 0 goals
+In 2014 during the Quarter-Final round:
+  7 scored 2 goals
+  9 scored 1 goals
+In 2014 during the Quarter-Final round:
+  17 scored 1 goals
+  1 scored 0 goals
+In 2014 during the Eighth-Final round:
+  7 scored 2 goals
+  20 scored 1 goals
+In 2014 during the Eighth-Final round:
+  9 scored 2 goals
+  8 scored 0 goals
+In 2014 during the Eighth-Final round:
+  1 scored 2 goals
+  21 scored 0 goals
+In 2014 during the Eighth-Final round:
+  17 scored 2 goals
+  22 scored 1 goals
+In 2014 during the Eighth-Final round:
+  18 scored 2 goals
+  12 scored 1 goals
+In 2014 during the Eighth-Final round:
+  19 scored 2 goals
+  23 scored 1 goals
+In 2014 during the Eighth-Final round:
+  16 scored 1 goals
+  10 scored 0 goals
+In 2014 during the Eighth-Final round:
+  3 scored 2 goals
+  24 scored 1 goals
+codeally@2f074abca5ca:~/project$ 
+	v
+
+
+Look at dfk file(result of games_test file) = test table & dfkat file(result of games_test file) = games!!!!!!
+	v
+
+
+sdf
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+:'
+
+  if [[ $YEAR != "year" ]]
+  then
+    #ROUND_ID=$($PSQL "SELECT round_id FROM games WHERE year='$YEAR' AND winner='$WINNER' AND opponent='$OPPONENT'")
+    YEAR_ID=$($PSQL "SELECT year FROM games WHERE year='$YEAR'")
+
+    if [[ -z $YEAR_ID ]]
+    then
+      INSERT_YEAR=$($PSQL "INSERT INTO games(year) VALUES('$YEAR')")
+    
+      if [[ $INSERT_YEAR == "INSERT 0 1" ]]
+      then
+        echo I $YEAR has been inserted into the games table
+      fi
+    fi
+  fi
+
+  if [[ $ROUND != "round" ]]
+  then
+    ROUND_ID=$($PSQL "SELECT round FROM games WHERE round='$ROUND'")
+
+    #Remember that we want to check the result of the above to see if its empty or not!!!!
+    if [[ -z $ROUND_ID ]]
+    then
+      INSERT_ROUND=$($PSQL "INSERT INTO games(round) VALUES('$ROUND')")
+
+      if [[ INSERT_ROUND == "INSERT 0 1" ]]
+      then
+        echo The $ROUND round has been added to games
+      fi
+    fi
+  fi
+
+  if [[ $WGOALS != "winner_goals" ]]
+  then
+    WGOALS_ID=$($PSQL "SELECT winner_goals FROM games WHERE winner_goals='$WGOALS'")
+
+    if [[ -z $WGOALS_ID ]]
+    then
+      INSERT_WGOALS=$($PSQL "INSERT INTO games(winner_goals) VALUES('$WGOALS')")
+
+      if [[ $INSERT_WGOALS == "INSERT 0 1" ]]
+      then
+        echo The winners goals $WGOALS has been added to games
+      fi
+    fi
+  fi
+
+  if [[ $OGOALS != "opponent_goals" ]]
+  then
+    OGOALS_ID=$($PSQL "SELECT opponent_goals FROM games WHERE opponent_goals='$OGOALS'")
+
+    if [[ -z $OGOALS ]]
+    then
+      INSERT_OGOALS=$($PSQL "INSERT INTO games(opponent_goals) VALUES('$OGOALS')")
+
+      if [[ $INSERT_OGOALS == "INSERT 0 1" ]]
+      then
+        echo The opponent goals $OGOALS was added to games
+      fi
+    fi
+  fi
+
+  '
+
+
+
+-------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+cat games_test.csv | while IFS="," read YEAR ROUND WINNER OPPONENT WGOALS OGOALS 
+do
+  if [[ $YEAR != "year" ]]
+  then
+    #You want to check if both teams are present TO GET THE GAME_ID
+    #GAME_ID is an important variable that we added in order to check opponent/winner teams and add them to games!!!!
+    #GAME_ID=$($PSQL "SELECT name FROM teams WHERE name='$WINNER' AND name='$OPPONENT'")
+    WINNER_ID=$($PSQL "SELECT team_id FROM teams WHERE name='$WINNER'")
+    OPPONENT_ID=$($PSQL "SELECT team_id FROM teams WHERE name='$OPPONENT'")
+
+    echo -e "In $YEAR during the $ROUND round:\n  $WINNER_ID scored $WGOALS goals\n  $OPPONENT_ID scored $OGOALS goals"
+
+    #if [[ -z $GAME_ID ]]
+    #then
+      INSERT_GAME=$($PSQL "INSERT INTO games(year, round, winner_id, opponent_id, winner_goals, opponent_id) VALUES('$YEAR', '$ROUND', '$WINNER_ID', '$OPPONENT_ID', '$WGOALS', '$OGOALS')")
+    #fi
+  fi
+done

@@ -1,0 +1,187 @@
+echo -e "\nNumber of games where the winning team scored more than two goals:"
+
+
+
+================================================================================================================
+
+
+
+echo "$($PSQL "SELECT COUNT(winner_goals) FROM games GROUP BY winner_goals HAVING winner_goals > 2")"
+-----------------------------------------------------------------------------------------------------
+codeally@2f074abca5ca:~/project$ ./queries.sh
+
+Number of games where the winning team scored more than two goals:
+3
+2
+1
+
+codeally@2f074abca5ca:~/project$ 
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+echo "$($PSQL "SELECT winner_goals FROM games GROUP BY winner_goals HAVING winner_goals > 2")"
+----------------------------------------------------------------------------------------------
+codeally@2f074abca5ca:~/project$ ./queries.sh
+
+Number of games where the winning team scored more than two goals:
+3
+4
+7
+
+codeally@2f074abca5ca:~/project$ 
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+echo "$($PSQL "SELECT COUNT(game_id), winner_goals FROM games GROUP BY game_id HAVING winner_goals > 2")"
+------------------------------------------------------------------------------------------------------------
+codeally@2f074abca5ca:~/project$ ./queries.sh
+
+Number of games where the winning team scored more than two goals:
+1|3
+1|7
+1|4
+1|3
+1|3
+1|4
+
+codeally@2f074abca5ca:~/project$ 
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+echo "$($PSQL "SELECT SUM(winner_goals) FROM games GROUP BY winner_goals HAVING winner_goals > 2")"
+------------------------------------------------------------------------------------------------------------
+codeally@2f074abca5ca:~/project$ ./queries.sh
+
+Number of games where the winning team scored more than two goals:
+9
+8
+7
+
+codeally@2f074abca5ca:~/project$ 
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+echo "$($PSQL "SELECT winner_goals, COUNT(*) FROM games GROUP BY winner_goals HAVING winner_goals > 2")"
+------------------------------------------------------------------------------------------------------------
+codeally@2f074abca5ca:~/project$ ./queries.sh
+
+Number of games where the winning team scored more than two goals:
+3|3
+4|2
+7|1
+
+codeally@2f074abca5ca:~/project$ 
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+echo "$($PSQL "SELECT COUNT(*) FROM games GROUP BY winner_goals HAVING winner_goals > 2")"
+------------------------------------------------------------------------------------------------------------
+codeally@2f074abca5ca:~/project$ ./queries.sh
+
+Number of games where the winning team scored more than two goals:
+3
+2
+1
+
+codeally@2f074abca5ca:~/project$ 
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+echo "$($PSQL "SELECT SUM(COUNT(*)) FROM games GROUP BY winner_goals HAVING winner_goals > 2")"
+------------------------------------------------------------------------------------------------------------
+codeally@2f074abca5ca:~/project$ ./queries.sh
+
+Number of games where the winning team scored more than two goals:
+ERROR:  aggregate function calls cannot be nested
+LINE 1: SELECT SUM(COUNT(*)) FROM games GROUP BY winner_goals HAVING...
+
+codeally@2f074abca5ca:~/project$ 
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+echo "$($PSQL "SELECT COUNT(*) FROM games WHERE winner_goals > 2")"
+------------------------------------------------------------------------------------------------------------
+codeally@2f074abca5ca:~/project$ ./queries.sh
+
+Number of games where the winning team scored more than two goals:
+6
+
+codeally@2f074abca5ca:~/project$ 
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+
+							NEW EXAMPLE
+
+
+
+echo -e "\nList of unique winning team names in the whole data set:"
+
+
+================================================================================================================
+
+
+echo "$($PSQL "SELECT DISTINCT(name) FROM games AS g INNER JOIN teams AS t ON g.winner_id = t.team_id")"
+------------------------------------------------------------------------------------------------------------
+codeally@2f074abca5ca:~/project$ ./queries.sh
+
+List of unique winning team names in the whole data set:
+Colombia
+Uruguay
+Argentina
+Croatia
+Costa Rica
+Sweden
+Germany
+France
+Belgium
+England
+Russia
+Brazil
+Netherlands
+
+codeally@2f074abca5ca:~/project$ 
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+echo "$($PSQL "SELECT DISTINCT(name) FROM games AS g INNER JOIN teams AS t ON g.winner_id = t.team_id ORDER BY name ASC")"
+------------------------------------------------------------------------------------------------------------
+codeally@2f074abca5ca:~/project$ ./queries.sh
+
+List of unique winning team names in the whole data set:
+Argentina
+Belgium
+Brazil
+Colombia
+Costa Rica
+Croatia
+England
+France
+Germany
+Netherlands
+Russia
+Sweden
+Uruguay
+
+codeally@2f074abca5ca:~/project$ 
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
